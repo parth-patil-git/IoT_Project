@@ -1,10 +1,25 @@
 services:
   mqtt-broker:
-    image: eclipse/mosquitto
+    image: eclipse-mosquitto
     ports:
       - "1883:1883"
+    # Ensure mosquitto allows anonymous connections if not using auth
+    command: mosquitto -c /mosquitto-no-auth.conf
 
   data-collector:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.collector
+    environment:
+      - MQTT_BROKER=mqtt-broker
     depends_on:
-     - mqtt-broker
+      - mqtt-broker
+
+  camera-inference:
+    build: 
+      context: .
+      dockerfile: Dockerfile.inference
+    environment:
+      - MQTT_BROKER=mqtt-broker
+    depends_on:
+      - mqtt-broker
