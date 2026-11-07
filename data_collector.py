@@ -63,6 +63,7 @@ def main():
     while True:
         sensor_data = fetch_and_process_sensor_data()
         if sensor_data:
+            client.publish("sensor/pm25", json.dumps(sensor_data), qos=1)
             print(f"Processed {len(sensor_data)} valid PM2.5 readings.")
 
         camera_frame = fetch_camera_frame()

@@ -23,3 +23,14 @@ services:
       - MQTT_BROKER=mqtt-broker
     depends_on:
       - mqtt-broker
+
+  pm25-prediction:
+    build:
+      context: .
+      dockerfile: Dockerfile.prediction
+    environment:
+      - MQTT_BROKER=mqtt-broker
+    volumes:
+      - ./prediction_output:/app/output
+    depends_on:
+      - mqtt-broker
