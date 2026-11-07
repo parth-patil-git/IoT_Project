@@ -3,6 +3,7 @@ import time
 import os
 from datetime import datetime
 import paho.mqtt.client as mqtt
+import json
 
 # Dynamically pull the broker from Docker environment, fallback to localhost
 BROKER = os.environ.get("MQTT_BROKER", "localhost")

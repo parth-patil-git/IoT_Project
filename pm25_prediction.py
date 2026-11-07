@@ -8,7 +8,7 @@ import sys
 # Add the cloned ML Engine directory to the Python path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'CSC8112_MLEngine'))
 # Note: Adjust the import below based on the actual main function name in the provided repo
-from ml_model import predict_pm25 
+from ml_engine import MLPredictor
 
 BROKER = os.environ.get("MQTT_BROKER", "localhost")
 TOPIC = "sensor/pm25"
@@ -88,7 +88,7 @@ def process_and_predict():
     try:
         # Pass the 10-minute averaged dataframe and the output directory for graph generation
         # Adjust arguments based on the specific function signature of the provided repository
-        predict_pm25(data=df_10min, output_path=OUTPUT_DIR)
+        MLPredictor(data=df_10min, output_path=OUTPUT_DIR)
         print(f"ML prediction completed. Output graphs saved to {OUTPUT_DIR}")
     except Exception as e:
         print(f"ML Engine execution failed: {e}")
