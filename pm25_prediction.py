@@ -5,13 +5,12 @@ import matplotlib.pyplot as plt
 import os
 import sys
 
-# Add the cloned ML Engine directory to the Python path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'CSC8112_MLEngine'))
 from ml_engine import MLPredictor
 
 BROKER = os.environ.get("MQTT_BROKER", "localhost")
 TOPIC = "sensor/pm25"
-TARGET_POINTS = 8706
+TARGET_POINTS = 1000
 OUTPUT_DIR = "/app/output"
 
 pm25_dataset = []
@@ -29,12 +28,8 @@ def on_message(client, userdata, msg):
             pm25_dataset.extend(payload)
         else:
             pm25_dataset.append(payload)
-            
-        print(f"Collected {len(pm25_dataset)}/{TARGET_POINTS} PM2.5 data points...", end='\r')
-        
-        if len(pm25_dataset) >= TARGET_POINTS:
-            print(f"\nTarget of {TARGET_POINTS} points reached. Disconnecting to process data.")
-            client.disconnect()
+
+        print(f"Collected {len(pm25_dataset)}/{TARGET_POINTS} PM2.5 data points...")
             
     except Exception as e:
         print(f"\nError processing message: {e}")
@@ -47,7 +42,8 @@ def process_and_predict():
     df.drop_duplicates(subset=['Timestamp'], inplace=True)
     df.sort_values(by='Timestamp', inplace=True)
     
-    df['Timestamp'] = pd.to_datetime(df['Timestamp'])
+    df['Timestamp'] = pd.to_numeric(df['Timestamp'])
+    df['Timestamp'] = pd.to_datetime(df['Timestamp'], unit='ms')
     df['Formatted_Timestamp'] = df['Timestamp'].dt.strftime('%Y-%m-%d %H:%M:%S')
     
     print("Formatted PM2.5 Data:")
@@ -56,10 +52,10 @@ def process_and_predict():
     df.set_index('Timestamp', inplace=True)
     
     # Average the PM2.5 data over 10-minute periods
-    df_10min = df.resample('10min').mean()
+    df_10min = df.resample('10min').mean(numeric_only=True)
     
     # Average daily data and visualize
-    df_daily = df.resample('D').mean()
+    df_daily = df.resample('D').mean(numeric_only=True)
     
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     
@@ -99,7 +95,17 @@ if __name__ == "__main__":
     client.on_connect = on_connect
     client.on_message = on_message
     
-    client.connect(BROKER, 1883, 60)
-    client.loop_forever() 
+    client.connect(BROKER, 1883, 120)
+    
+    client.loop_start()
+        
+    import time
+    while len(pm25_dataset) < TARGET_POINTS:
+        time.sleep(1)
+        
+    print("Target points reached.")
+
+    client.loop_stop()
+    client.disconnect()
     
     process_and_predict()

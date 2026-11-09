@@ -59,13 +59,15 @@ def main():
     print(f"Starting Data Collector Component. Connecting to broker: {BROKER}")
 
     client = mqtt.Client()
-    client.connect(BROKER, 1883, 60)
+    client.connect(BROKER, 1883, 120)
+    client.loop_start()
 
     while True:
         sensor_data = fetch_and_process_sensor_data()
         if sensor_data:
-            client.publish("sensor/pm25", json.dumps(sensor_data), qos=1)
             print(f"Processed {len(sensor_data)} valid PM2.5 readings.")
+            for reading in sensor_data:
+                client.publish("sensor/pm25", json.dumps(reading), qos=1)
 
         camera_frame = fetch_camera_frame()
 
