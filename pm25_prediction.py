@@ -10,7 +10,7 @@ from ml_engine import MLPredictor
 
 BROKER = os.environ.get("MQTT_BROKER", "localhost")
 TOPIC = "sensor/pm25"
-TARGET_POINTS = 1000
+TARGET_POINTS = 8706
 OUTPUT_DIR = "/app/output"
 
 pm25_dataset = []
@@ -50,26 +50,23 @@ def process_and_predict():
     print(df[['Formatted_Timestamp', 'Value']].tail())
     
     df.set_index('Timestamp', inplace=True)
-    
-    # Average the PM2.5 data over 10-minute periods
+
     df_10min = df.resample('10min').mean(numeric_only=True)
-    
-    # Average daily data and visualize
-    df_daily = df.resample('D').mean(numeric_only=True)
     
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     
-    plt.figure(figsize=(10, 5))
-    plt.plot(df_daily.index, df_daily['Value'], marker='o', linestyle='-', color='b')
-    plt.title('Daily Averaged PM2.5 Data')
-    plt.xlabel('Date')
+    # Plot the 10-minute data instead of the daily data
+    plt.figure(figsize=(12, 5))
+    plt.plot(df_10min.index, df_10min['Value'], marker='.', linestyle='-', color='b')
+    plt.title('10-Minute Averaged PM2.5 Data')
+    plt.xlabel('Time')
     plt.ylabel('PM2.5 Value')
     plt.grid(True)
     plt.tight_layout()
     
-    daily_plot_path = os.path.join(OUTPUT_DIR, 'daily_pm25_trend.png')
-    plt.savefig(daily_plot_path)
-    print(f"Daily trend chart saved to {daily_plot_path}")
+    trend_plot_path = os.path.join(OUTPUT_DIR, '10min_pm25_trend.png')
+    plt.savefig(trend_plot_path)
+    print(f"10-minute trend chart saved to {trend_plot_path}")
     
     print("\n--- Initializing Machine Learning Engine ---")
     try:
