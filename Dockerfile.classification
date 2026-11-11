@@ -1,0 +1,14 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# Install system dependencies required for Matplotlib
+RUN apt-get update && apt-get install -y gcc g++ python3-dev && rm -rf /var/lib/apt/lists/*
+
+# Install Edge dependencies (using lightweight tflite-runtime instead of heavy tensorflow)
+RUN pip install --no-cache-dir paho-mqtt pandas numpy matplotlib tflite-runtime
+
+COPY pm25_classification.py .
+COPY pm25_model.tflite .
+
+CMD ["python", "-u", "pm25_classification.py"]

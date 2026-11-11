@@ -34,3 +34,14 @@ services:
       - ./prediction_output:/app/output
     depends_on:
       - mqtt-broker
+
+  pm25-classifier:
+    build: 
+      context: ./classification_component
+      dockerfile: Dockerfile.classification
+    environment:
+      - MQTT_BROKER=mqtt-broker
+    volumes:
+      - ./prediction_output:/app/output
+    depends_on:
+      - mqtt-broker
