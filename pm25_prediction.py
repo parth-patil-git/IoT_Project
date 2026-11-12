@@ -10,7 +10,7 @@ from ml_engine import MLPredictor
 
 BROKER = os.environ.get("MQTT_BROKER", "localhost")
 TOPIC = "sensor/pm25"
-TARGET_POINTS = 8706
+TARGET_POINTS = 3000
 OUTPUT_DIR = "/app/output"
 
 pm25_dataset = []
