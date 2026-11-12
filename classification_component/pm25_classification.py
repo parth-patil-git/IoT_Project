@@ -97,10 +97,25 @@ def process_and_classify(client):
 
     # C. Frequency Distribution (Histogram)
     plt.figure(figsize=(10, 5))
-    plt.hist(df['Value'], bins=50, color='purple', edgecolor='black')
+    
+    # Isolate the PM2.5 values by their calculated classification
+    green_data = df[df['Classification'] == 'Green']['Value']
+    yellow_data = df[df['Classification'] == 'Yellow']['Value']
+    red_data = df[df['Classification'] == 'Red']['Value']
+    
+    # Plot as a stacked histogram matching your exact color mapping
+    plt.hist([green_data, yellow_data, red_data], 
+             bins=50, 
+             stacked=True, 
+             color=['green', 'yellow', 'red'], 
+             edgecolor='black', 
+             label=['Green', 'Yellow', 'Red'])
+             
     plt.title('PM2.5 Value Frequency Distribution')
     plt.xlabel('PM2.5 Value')
     plt.ylabel('Frequency')
+    plt.legend()
+    
     plt.savefig(os.path.join(OUTPUT_DIR, 'pm25_distribution.png'))
     plt.close()
 
