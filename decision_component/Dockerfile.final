@@ -1,0 +1,10 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# Install lightweight networking dependencies
+RUN pip install --no-cache-dir paho-mqtt requests urllib3
+
+COPY final_output.py .
+
+CMD ["python", "-u", "final_output.py"]

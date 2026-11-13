@@ -45,3 +45,14 @@ services:
       - ./prediction_output:/app/output
     depends_on:
       - mqtt-broker
+
+  final-output:
+    build: 
+      context: ./decision_component
+      dockerfile: Dockerfile.final
+    environment:
+      - MQTT_BROKER=mqtt-broker
+    depends_on:
+      - mqtt-broker
+      - pm25-classifier
+      - camera-inference

@@ -9,7 +9,7 @@ import tflite_runtime.interpreter as tflite
 BROKER = os.environ.get("MQTT_BROKER", "localhost")
 SUBSCRIBE_TOPIC = "sensor/pm25"
 PUBLISH_TOPIC = "sensor/classification"
-TARGET_POINTS = 8629
+TARGET_POINTS = 8000
 OUTPUT_DIR = "/app/output"
 
 pm25_dataset = []
